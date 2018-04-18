@@ -19,6 +19,8 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD, Nadam
 from keras.utils import plot_model
 
+from comet_ml import Experiment
+
 # Global Variables
 PATH = 'data/birds/'
 sz = 224
