@@ -1,5 +1,9 @@
-datasets/
 keras-flask-deploy-webapp/
-datasets/
 .vscode/
 Deep-Learning/
+google-image-download/
+proxies.lst
+*.jpg
+*.jpeg
+*.gif
+*.png
