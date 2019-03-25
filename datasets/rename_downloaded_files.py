@@ -1,30 +1,35 @@
 import glob, os,shutil
+import filetype
 
-def rename(dir, pattern, titlePattern):
-    for pathAndFilename in glob.iglob(os.path.join(dir, pattern)):
-        title, ext = os.path.splitext(os.path.basename(pathAndFilename))
-        os.rename(pathAndFilename, 
-                  os.path.join(dir, titlePattern % title + ext))
+DATA_DIR = "downloads"
 
 def rename_downloads():
-    for dirname in os.listdir("downloads"):
-        dirname = os.path.join(os.getcwd(),"downloads",dirname)
+    for dirname in os.listdir(DATA_DIR):
+        dirname = os.path.join(os.getcwd(),DATA_DIR,dirname)
         if os.path.isdir(dirname):
             for i, filename in enumerate(os.listdir(dirname)):
                 _, ext = os.path.splitext(os.path.basename(filename))
                 ext = ext.lower()
-                if ext not in (".jpg",".jpeg",".gif",".png",".bmp",".tiff"):
-                    ext = ".jpg"
+                kind = filetype.guess(os.path.join(dirname,filename))
+                if kind is not None:
+                    ext = ".{0}".format(kind.extension)
+                else:
+                    try:
+                        print("[WARN] :: Deleting {0}".format(filename))
+                        os.remove(os.path.join(dirname,filename))
+                        continue
+                    except Exception:
+                        print("[ERROR] :: Problem deleting {0}".format(filename))
                 new_name = "{0}_{1}{2}".format(
                     os.path.basename(dirname).lower(),
                     str(i),
                     ext
                     )
-                print("Renaming {0} to {1}".format(filename,new_name))           
+                print("[INFO] :: Renaming {0} to {1}".format(filename,new_name))           
                 try:
                     os.rename(os.path.join(dirname,filename),os.path.join(dirname,new_name))
                 except Exception:
-                    print("Failed renaming {}".format(
+                    print("[ERROR] :: Failed renaming {}".format(
                         os.path.join(dirname,filename)
                     ))
 

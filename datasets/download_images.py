@@ -3,20 +3,19 @@ import random
 import csv
 
 arguments = dict()
-arguments["limit"] = 5
+arguments["limit"] = 100
 arguments["print_urls"] = False
 arguments["format"] = "jpg"
 arguments["size"] = ">400*300"
 arguments["color_type"] = "full-color"
 arguments["output_directory"] = "data"
 #arguments["suffix_keywords"] = "winter,sommer,wald"
-arguments["language"] = "German"
+#arguments["language"] = "German"
 #arguments["usage_rights"] = "labeled-for-reuse"
 
 proxies_file = open("proxies.lst", "r+")
 
 proxies = proxies_file.readlines()
-# print (random.choice(proxies))
 
 with open('berlin-birds.csv', newline='') as csvfile:
     birdreader = csv.DictReader(csvfile, delimiter=',')
@@ -30,4 +29,8 @@ with open('berlin-birds.csv', newline='') as csvfile:
         arguments["image_directory"] = row["name"]
         arguments["proxy"] = random.choice(proxies).strip()
         print("Downloading {}".format(arguments))
-        response.download(arguments)
+        try:
+            response.download(arguments)
+        except Exception:
+            arguments["proxy"] = random.choice(proxies).strip()
+            response.download(arguments)
