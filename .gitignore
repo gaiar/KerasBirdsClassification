@@ -8,3 +8,7 @@ proxies.lst
 *.gif
 *.png
 *jpg
+*.zip
+*.gz
+*.webp
+chromedriver
