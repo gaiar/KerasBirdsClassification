@@ -10,17 +10,18 @@ def download_from_google():
 
     # Prepare config for google_images_download
     arguments = dict()
-    arguments["limit"] = 100
+    arguments["limit"] = 200
     arguments["print_urls"] = False
     arguments["format"] = "jpg"
     arguments["size"] = ">400*300"
     arguments["color_type"] = "full-color"
     arguments["output_directory"] = "data"
+    arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
 
     # Extra fine-tuning if needed
 
     #arguments["suffix_keywords"] = "winter,sommer,wald"
-    #arguments["language"] = "German"
+    arguments["language"] = "German"
     #arguments["usage_rights"] = "labeled-for-reuse"
 
     # Get proxies
@@ -33,13 +34,13 @@ def download_from_google():
             # print(row[0])
             response = google_images_download.googleimagesdownload()
             keywords = "{0} OR {1} {2}".format(
-                row["name"], row["latin_name"], "-stock")
+                row["name"], row["latin_name"], "-stock -watermark")
             prefix = "{0}{1}".format(
                 row["name"].lower().replace(" ", "_"), "_")
             arguments["keywords"] = keywords
             arguments["prefix"] = prefix
             arguments["image_directory"] = row["name"]
-            arguments["proxy"] = random.choice(proxies).strip()
+            #arguments["proxy"] = random.choice(proxies).strip()
             print("Downloading {}".format(arguments))
             try:
                 response.download(arguments)
@@ -97,4 +98,6 @@ def dowload_original_files():
                     row["image_url"], e))
 
 
-dowload_original_files()
+#dowload_original_files()
+
+download_from_google()
