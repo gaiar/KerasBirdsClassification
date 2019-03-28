@@ -22,7 +22,7 @@ def rename_downloads():
                         except Exception:
                             print("[ERROR] :: Problem deleting {0}".format(filename))
                     new_name = "{0}_{1}{2}".format(
-                        os.path.basename(dirname).lower(),
+                        os.path.basename(dirname).lower().replace(" ","_"),
                         str(i),
                         ext
                         )

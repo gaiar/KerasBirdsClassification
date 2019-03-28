@@ -5,23 +5,24 @@ import random
 import csv
 import os
 
+DOWNLOAD_FOLDER = "data"
 
 def download_from_google():
 
     # Prepare config for google_images_download
     arguments = dict()
-    arguments["limit"] = 200
+    arguments["limit"] = 1000
     arguments["print_urls"] = False
     arguments["format"] = "jpg"
     arguments["size"] = ">400*300"
     arguments["color_type"] = "full-color"
-    arguments["output_directory"] = "data"
+    arguments["output_directory"] = DOWNLOAD_FOLDER
     arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
 
     # Extra fine-tuning if needed
 
     #arguments["suffix_keywords"] = "winter,sommer,wald"
-    arguments["language"] = "German"
+    #arguments["language"] = "German"
     #arguments["usage_rights"] = "labeled-for-reuse"
 
     # Get proxies
