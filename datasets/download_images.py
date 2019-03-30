@@ -10,13 +10,13 @@ def download_from_google():
 
     # Prepare config for google_images_download
     arguments = dict()
-    arguments["limit"] = 200
+    arguments["limit"] = 1000
     arguments["print_urls"] = False
     arguments["format"] = "jpg"
     arguments["size"] = ">400*300"
     arguments["color_type"] = "full-color"
     arguments["output_directory"] = "data"
-    arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
+    arguments["chromedriver"] = "/Users/user/Developer/conda-stuff/birds-of-berlin/datasets/chromedriver"
 
     # Extra fine-tuning if needed
 
@@ -25,8 +25,8 @@ def download_from_google():
     #arguments["usage_rights"] = "labeled-for-reuse"
 
     # Get proxies
-    proxies_file = open("proxies.lst", "r+")
-    proxies = proxies_file.readlines()
+    #proxies_file = open("proxies.lst", "r+")
+    #proxies = proxies_file.readlines()
 
     with open('berlin-birds.csv', newline='') as csvfile:
         birdreader = csv.DictReader(csvfile, delimiter=',')
@@ -45,23 +45,10 @@ def download_from_google():
             try:
                 response.download(arguments)
             except Exception:
-                arguments["proxy"] = random.choice(proxies).strip()
+                #arguments["proxy"] = random.choice(proxies).strip()
                 response.download(arguments)
 
-    proxies_file.close()
-
-
-def get_filename_from_cd(cd):
-    """
-    Get filename from content-disposition
-    """
-    if not cd:
-        return None
-    fname = re.findall('filename=(.+)', cd)
-    if len(fname) == 0:
-        return None
-    return fname[0]
-
+    #proxies_file.close()
 
 DATA_DIR = "data/test"
 
