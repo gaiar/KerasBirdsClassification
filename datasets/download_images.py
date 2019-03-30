@@ -5,6 +5,7 @@ import random
 import csv
 import os
 
+DOWNLOAD_FOLDER = "data"
 
 def download_from_google():
 
@@ -15,13 +16,14 @@ def download_from_google():
     arguments["format"] = "jpg"
     arguments["size"] = ">400*300"
     arguments["color_type"] = "full-color"
-    arguments["output_directory"] = "data"
-    arguments["chromedriver"] = "/Users/user/Developer/conda-stuff/birds-of-berlin/datasets/chromedriver"
+
+    arguments["output_directory"] = DOWNLOAD_FOLDER
+    arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
 
     # Extra fine-tuning if needed
 
     #arguments["suffix_keywords"] = "winter,sommer,wald"
-    arguments["language"] = "German"
+    #arguments["language"] = "German"
     #arguments["usage_rights"] = "labeled-for-reuse"
 
     # Get proxies
