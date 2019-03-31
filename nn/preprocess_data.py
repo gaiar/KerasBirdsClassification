@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 import shutil
 import random
 from shutil import copyfile
@@ -41,7 +42,7 @@ def split_data():
             # print(filenames)
             # total+= len(os.listdir(source_dir + "%s/" % i ))
             # print (total)
-            ## print filenames
+            # print filenames
             # copy the files to the new destination
             for j in filenames:
                 print(source_dir + "%s/" % i + j)
@@ -110,10 +111,12 @@ def split_dataset_into_test_and_train_sets(all_data_dir, training_data_dir, test
         for file in files:
             input_file = os.path.join(subdir, file)
             if np.random.rand(1) < testing_data_pct:
-                shutil.copy(input_file, testing_data_dir + '/' + category_name + '/' + file)
+                shutil.copy(input_file, testing_data_dir +
+                            '/' + category_name + '/' + file)
                 num_testing_files += 1
             else:
-                shutil.copy(input_file, training_data_dir + '/' + category_name + '/' + file)
+                shutil.copy(input_file, training_data_dir +
+                            '/' + category_name + '/' + file)
                 num_training_files += 1
 
     print("Processed " + str(num_training_files) + " training files.")
