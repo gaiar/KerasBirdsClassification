@@ -5,38 +5,47 @@ import random
 import csv
 import os
 
-DOWNLOAD_FOLDER = "data"
+DOWNLOAD_FOLDER = "data-clean"
+STOP_WORDS = ""
+
+def prepare_stop_words():
+    with open('stop-words', newline='') as stopwords:
+        sw = stopwords.read().splitlines()
+        words = ' -'.join([str(x) for x in sw])
+        words = "-" + words
+    return words
+
+STOP_WORDS = prepare_stop_words()
+print(STOP_WORDS)
 
 def download_from_google():
 
     # Prepare config for google_images_download
     arguments = dict()
-    arguments["limit"] = 1000
+    arguments["limit"] = 300
     arguments["print_urls"] = False
     arguments["format"] = "jpg"
     arguments["size"] = ">400*300"
     arguments["color_type"] = "full-color"
-
     arguments["output_directory"] = DOWNLOAD_FOLDER
-    arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
-
+    #arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
+    arguments["chromedriver"] = "/Users/user/Developer/conda-stuff/birds-of-berlin/datasets/chromedriver"
+    
     # Extra fine-tuning if needed
-
     #arguments["suffix_keywords"] = "winter,sommer,wald"
     #arguments["language"] = "German"
     #arguments["usage_rights"] = "labeled-for-reuse"
 
     # Get proxies
-    #proxies_file = open("proxies.lst", "r+")
-    #proxies = proxies_file.readlines()
+    # proxies_file = open("proxies.lst", "r+")
+    # proxies = proxies_file.readlines()
 
-    with open('berlin-birds.csv', newline='') as csvfile:
+    with open('berlin-birds-extended.csv', newline='') as csvfile:
         birdreader = csv.DictReader(csvfile, delimiter=',')
         for row in birdreader:
-            # print(row[0])
             response = google_images_download.googleimagesdownload()
-            keywords = "{0} OR {1} {2}".format(
-                row["name"], row["latin_name"], "-stock -watermark")
+            keywords = "{0} OR {1} OR {2} {3}".format(
+                row["name"], row["alt_name"], row["latin_name"], STOP_WORDS)
             prefix = "{0}{1}".format(
                 row["name"].lower().replace(" ", "_"), "_")
             arguments["keywords"] = keywords
@@ -50,7 +59,8 @@ def download_from_google():
                 #arguments["proxy"] = random.choice(proxies).strip()
                 response.download(arguments)
 
-    #proxies_file.close()
+    # proxies_file.close()
+
 
 DATA_DIR = "data/test"
 
@@ -68,7 +78,7 @@ def get_directory(bird_name):
 
 
 def dowload_original_files():
-    with open('berlin-birds.csv', newline='') as csvfile:
+    with open('berlin-birds - berlin-birds.csv', newline='') as csvfile:
         birdreader = csv.DictReader(csvfile, delimiter=',')
         for row in birdreader:
             print("[INFO] :: Downloading {0}".format(row["image_url"]))
@@ -87,6 +97,6 @@ def dowload_original_files():
                     row["image_url"], e))
 
 
-#dowload_original_files()
+# dowload_original_files()
 
 download_from_google()
