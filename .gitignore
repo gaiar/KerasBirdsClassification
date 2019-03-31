@@ -12,3 +12,5 @@ proxies.lst
 *.gz
 *.webp
 chromedriver
+.env
+*checkpoint*
