@@ -3,8 +3,7 @@ import os
 import shutil
 import filetype
 
-DATA_DIR = "downloads"
-
+DATA_DIR = "data-clean"
 
 def rename_downloads():
     for dirname in os.listdir(DATA_DIR):
@@ -15,7 +14,9 @@ def rename_downloads():
                     _, ext = os.path.splitext(os.path.basename(filename))
                     ext = ext.lower()
                     kind = filetype.guess(os.path.join(dirname, filename))
-                    if (kind is not None) and ("image" in kind.mime):
+                    if kind is not None:
+                        if "image" in kind.mime:
+                            print(kind.mime)
                         ext = ".{0}".format(kind.extension)
                     else:
                         try:

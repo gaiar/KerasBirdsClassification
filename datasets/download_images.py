@@ -28,13 +28,13 @@ def download_from_google():
     arguments["size"] = ">400*300"
     arguments["color_type"] = "full-color"
     arguments["output_directory"] = DOWNLOAD_FOLDER
-    #arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
     arguments["chromedriver"] = "/Users/user/Developer/conda-stuff/birds-of-berlin/datasets/chromedriver"
     
     # Extra fine-tuning if needed
     #arguments["suffix_keywords"] = "winter,sommer,wald"
     #arguments["language"] = "German"
     #arguments["usage_rights"] = "labeled-for-reuse"
+    #arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
 
     # Get proxies
     # proxies_file = open("proxies.lst", "r+")
@@ -78,7 +78,7 @@ def get_directory(bird_name):
 
 
 def dowload_original_files():
-    with open('berlin-birds - berlin-birds.csv', newline='') as csvfile:
+    with open('berlin-birds-extended.csv', newline='') as csvfile:
         birdreader = csv.DictReader(csvfile, delimiter=',')
         for row in birdreader:
             print("[INFO] :: Downloading {0}".format(row["image_url"]))
@@ -88,7 +88,6 @@ def dowload_original_files():
                 if row["image_url"].find('/'):
                     filename = row["image_url"].rsplit('/', 1)[1]
                 filename = os.path.join(get_directory(row["name"]), filename)
-
                 print("[INFO] :: Writing {0}".format(filename))
                 with open(filename, 'wb') as image_file:
                     image_file.write(r.content)
