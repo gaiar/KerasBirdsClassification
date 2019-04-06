@@ -11,60 +11,87 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
+DATA_SOURCE_DIR = "test"
+DATA_DEST_DIR = "data"
 
-DATA_DIR = "data-clean"
+
+def delete_file(filename):
+    try:
+        print("[WARN] :: Deleting {0}".format(filename))
+        logging.warning("Deleting {0}".format(filename))
+        os.remove(filename)
+    except Exception:
+        print(
+            "[ERROR] :: Problem deleting {0}".format(filename))
+        logging.error(
+            "Problem deleting {0}".format(filename))
 
 
-# import os, os.path
+def move_file(source_file, dest_file):
+    try:
+        os.rename(source_file, dest_file)
+    except Exception as e:
+        print("[ERROR] :: Failed renaming {}".format(
+            source_file
+        ))
+        logging.error("Failed renaming {0}. Problem is {1}".format(
+            source_file, e
+        ))
 
-# # simple version for working with CWD
-# print len([name for name in os.listdir('.') if os.path.isfile(name)])
+def get_directory(base_dir, bird_name):
+    directory = os.path.join(os.getcwd(), base_dir, bird_name)
+    try:
+        os.mkdir(directory)
+    except OSError:
+        print("[WARN] :: Directory {0} already exist".format(directory))
+        logging.warning("Directory {0} already exist".format(directory))
+    else:
+        print("[INFO] :: Directory {0} created".format(directory))
+        logging.info("Directory {0} created".format(directory))
+    finally:
+        return directory
 
-# # path joining version for other paths
-# DIR = '/tmp'
-# print len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
+
+#DATA_DIR = "data-clean"
+
 
 def rename_downloads():
-    for dirname in os.listdir(DATA_DIR):
-        dirname = os.path.join(os.getcwd(), DATA_DIR, dirname)
-        if os.path.isdir(dirname):
-            for i, filename in enumerate(os.listdir(dirname)):
-                if not os.path.isdir(os.path.join(dirname, filename)):
-                    ext = ""    
-                    kind = filetype.guess(os.path.join(dirname, filename))
+    for dirname in os.listdir(DATA_SOURCE_DIR):
+        source_dir = os.path.join(os.getcwd(), DATA_SOURCE_DIR, dirname)
+        dest_dir = get_directory(DATA_DEST_DIR,dirname)
+
+        logging.debug("Copying files from {0} to {1}".format(source_dir,dest_dir))
+
+        if os.path.isdir(source_dir):
+            for i, filename in enumerate(os.listdir(source_dir)):
+                if not os.path.isdir(os.path.join(source_dir, filename)):
+                    ext = ""
+                    kind = filetype.guess(os.path.join(source_dir, filename))
+
                     if kind is not None:
-                        logging.debug("File {0} has type of {1}".format(filename, kind.mime))
+                        logging.debug("File {0} has type of {1}".format(
+                            filename, kind.mime))
                         ext = ".{0}".format(kind.extension)
                     else:
-                        try:
-                            print("[WARN] :: Deleting {0}".format(filename))
-                            logging.warning("Deleting {0}".format(filename))
-                            os.remove(os.path.join(dirname, filename))
-                        except Exception:
-                            print(
-                                "[ERROR] :: Problem deleting {0}".format(filename))
-                            logging.error(
-                                "Problem deleting {0}".format(filename))
+                        delete_file(os.path.join(source_dir, filename))
                         continue
+
+                    n = len(os.listdir(dest_dir))
+                    logging.debug("{0} :: {1} of files".format(dest_dir,n))
+
                     new_name = "{0}_{1}{2}".format(
-                        os.path.basename(dirname).lower().replace(" ", "_"),
-                        str(i),
+                        os.path.basename(dest_dir).lower().replace(" ", "_"),
+                        str(n+1),
                         ext
                     )
                     print("[INFO] :: Renaming {0} to {1}".format(
                         filename, new_name))
                     logging.info("Renaming {0} to {1}".format(
                         filename, new_name))
-                    try:
-                        os.rename(os.path.join(dirname, filename),
-                                  os.path.join(dirname, new_name))
-                    except Exception as e:
-                        print("[ERROR] :: Failed renaming {}".format(
-                            os.path.join(dirname, filename)
-                        ))
-                        logging.error("Failed renaming {0}. Problem is {1}".format(
-                            os.path.join(dirname, filename), e
-                        ))
+
+                    source_file = os.path.join(source_dir, filename)
+                    dest_file = os.path.join(dest_dir, new_name)
+                    move_file(source_file, dest_file)
                 else:
                     print(
                         "[INFO] :: {0} is directory. Skipping.".format(filename))
