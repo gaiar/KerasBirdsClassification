@@ -14,4 +14,4 @@ proxies.lst
 chromedriver
 .env
 *checkpoint*
-.log
+*.log
