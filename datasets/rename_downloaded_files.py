@@ -11,8 +11,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
-DATA_SOURCE_DIR = "duplicates"
-DATA_DEST_DIR = "data"
+DATA_SOURCE_DIR = "data"
+DATA_DEST_DIR = "data-clean"
 
 
 def delete_file(filename):

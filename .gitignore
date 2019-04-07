@@ -20,4 +20,8 @@ chromedriver
 data-clean/
 data/
 duplicates/
+data-all/
+duplicates-all/
+valid/
+google-images-download/
 

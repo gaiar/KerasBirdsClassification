@@ -10,8 +10,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
-SOURCE_DIR = "data"
-DULICATES_DEST = "duplicates"
+SOURCE_DIR = "duplicates"
+DULICATES_DEST = "dupdup"
 
 
 def move_file(source_file, dest_file):
