@@ -11,7 +11,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
-DATA_SOURCE_DIR = "test"
+DATA_SOURCE_DIR = "duplicates"
 DATA_DEST_DIR = "data"
 
 

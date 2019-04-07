@@ -16,10 +16,14 @@ logging.basicConfig(
 )
 
 DOWNLOAD_FOLDER = "data-clean"
+
 STOP_WORDS = ""
+STOP_WORDS_SHUFFLE = False
 DOWNLOAD_VALIDATION = True
-USE_FINETUNING = False
+USE_FINETUNING = True
 USE_FINETUNING_EXTRA = False
+
+
 
 def prepare_proxies():
     try:
@@ -36,6 +40,9 @@ def prepare_stop_words():
     try:
         with open('stop-words', newline='') as stopwords:
             sw = stopwords.read().splitlines()
+            if STOP_WORDS_SHUFFLE:
+                random.shuffle(sw)
+            sw = sw[:29]
             words = ' -'.join([str(x) for x in sw])
             words = "-" + words
         return words
@@ -46,7 +53,7 @@ def prepare_stop_words():
 
 STOP_WORDS = prepare_stop_words()
 PROXIES = prepare_proxies()
-
+PROXIES = None
 
 if STOP_WORDS is None:
     print("[ERROR] :: Please check stop-words file")
@@ -59,10 +66,11 @@ logging.debug("PROXIES to be used {0}".format(PROXIES))
 
 PROXIES = None
 
+
 def download_from_google():
     # Prepare config for google_images_download
     arguments = dict()
-    arguments["limit"] = 100
+    arguments["limit"] = 1000
     arguments["print_urls"] = False
     arguments["format"] = "jpg"
     arguments["size"] = ">400*300"
@@ -71,25 +79,28 @@ def download_from_google():
     arguments["chromedriver"] = "/Users/user/Developer/conda-stuff/birds-of-berlin/datasets/chromedriver"
     #arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
 
-
     # Extra fine-tuning if needed
     if USE_FINETUNING:
         arguments["suffix_keywords"] = "winter,sommer,wald"
-    
+
     if USE_FINETUNING_EXTRA:
         arguments["language"] = "German"
         arguments["usage_rights"] = "labeled-for-reuse"
-
 
     with open('berlin-birds-extended.csv', newline='') as csvfile:
         birdreader = csv.DictReader(csvfile, delimiter=',')
         for row in birdreader:
             response = google_images_download.googleimagesdownload()
-            keywords = "{0} OR {1} OR {2} {3}".format(
-                row["name"], row["alt_name"], row["latin_name"], STOP_WORDS)
+            if len(row["alt_name"]) > 1:
+                keywords = "{0} OR {1} OR {2} {3}".format(
+                    row["name"], row["alt_name"], row["latin_name"], STOP_WORDS)
+            else:
+                keywords = "{0} OR {1} {2}".format(
+                    row["name"], row["latin_name"], STOP_WORDS)
+
+            arguments["keywords"] = keywords
             prefix = "{0}{1}".format(
                 row["name"].lower().replace(" ", "_"), "_")
-            arguments["keywords"] = keywords
             arguments["prefix"] = prefix
             arguments["image_directory"] = row["name"]
 
@@ -103,7 +114,8 @@ def download_from_google():
             try:
                 response.download(arguments)
             except Exception as error:
-                logging.error("Problem downloading {0}. {1}".format(arguments,error))
+                logging.error(
+                    "Problem downloading {0}. {1}".format(arguments, error))
                 response.download(arguments)
 
 
@@ -146,11 +158,7 @@ def dowload_original_files():
                     row["image_url"], e))
 
 
-
-
 download_from_google()
 
 if DOWNLOAD_VALIDATION:
     dowload_original_files()
-
-
