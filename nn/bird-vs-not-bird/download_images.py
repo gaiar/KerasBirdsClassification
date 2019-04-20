@@ -15,15 +15,15 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
-DOWNLOAD_FOLDER = "data-clean"
-
+DOWNLOAD_FOLDER = "data-dirty"
+WORDS_FILE = "not-bird.csv"
+#WORDS_FILE = "berlin-birds-extended.csv"
+IMAGES_LIMIT = 100
 STOP_WORDS = ""
 STOP_WORDS_SHUFFLE = False
-DOWNLOAD_VALIDATION = True
-USE_FINETUNING = True
+DOWNLOAD_VALIDATION = False
+USE_FINETUNING = False
 USE_FINETUNING_EXTRA = False
-NUM_IMAGES = 100
-
 
 
 def prepare_proxies():
@@ -66,39 +66,33 @@ logging.debug("PROXIES to be used {0}".format(PROXIES))
 
 
 PROXIES = None
-
+#STOP_WORDS= ""
 
 def download_from_google():
     # Prepare config for google_images_download
     arguments = dict()
-    arguments["limit"] = NUM_IMAGES
+    arguments["limit"] = IMAGES_LIMIT
     arguments["print_urls"] = False
     arguments["format"] = "jpg"
     arguments["size"] = ">400*300"
     arguments["color_type"] = "full-color"
     arguments["output_directory"] = DOWNLOAD_FOLDER
-    #arguments["chromedriver"] = "/Users/user/Developer/conda-stuff/birds-of-berlin/datasets/chromedriver"
+    arguments["chromedriver"] = "/Users/user/Developer/conda-stuff/birds-of-berlin/datasets/chromedriver"
     #arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
 
     # Extra fine-tuning if needed
     if USE_FINETUNING:
-        arguments["suffix_keywords"] = "winter,sommer,wald"
+        arguments["suffix_keywords"] = "птица,птицы"
 
     if USE_FINETUNING_EXTRA:
         arguments["language"] = "German"
         arguments["usage_rights"] = "labeled-for-reuse"
 
-    with open('berlin-birds-extended.csv', newline='') as csvfile:
+    with open(WORDS_FILE, newline='') as csvfile:
         birdreader = csv.DictReader(csvfile, delimiter=',')
         for row in birdreader:
             response = google_images_download.googleimagesdownload()
-            if len(row["alt_name"]) > 1:
-                keywords = "{0} OR {1} OR {2} {3}".format(
-                    row["name"], row["alt_name"], row["latin_name"], STOP_WORDS)
-            else:
-                keywords = "{0} OR {1} {2}".format(
-                    row["name"], row["latin_name"], STOP_WORDS)
-
+            keywords = "{0} {1}".format(row["name"], STOP_WORDS)
             arguments["keywords"] = keywords
             prefix = "{0}{1}".format(
                 row["name"].lower().replace(" ", "_"), "_")
@@ -136,30 +130,4 @@ def get_directory(bird_name):
     finally:
         return directory
 
-
-def dowload_original_files():
-    with open('berlin-birds-extended.csv', newline='') as csvfile:
-        birdreader = csv.DictReader(csvfile, delimiter=',')
-        for row in birdreader:
-            print("[INFO] :: Downloading {0}".format(row["image_url"]))
-            logging.info("Downloading {0}".format(row["image_url"]))
-            try:
-                r = requests.get(row["image_url"], allow_redirects=True)
-                if row["image_url"].find('/'):
-                    filename = row["image_url"].rsplit('/', 1)[1]
-                filename = os.path.join(get_directory(row["name"]), filename)
-                print("[INFO] :: Writing {0}".format(filename))
-                logging.info("Writing {0}".format(filename))
-                with open(filename, 'wb') as image_file:
-                    image_file.write(r.content)
-            except Exception as e:
-                print("[ERROR] :: Problem downloading {0}. {1}".format(
-                    row["image_url"], e))
-                logging.error("Problem downloading {0}. {1}".format(
-                    row["image_url"], e))
-
-
 download_from_google()
-
-if DOWNLOAD_VALIDATION:
-    dowload_original_files()
