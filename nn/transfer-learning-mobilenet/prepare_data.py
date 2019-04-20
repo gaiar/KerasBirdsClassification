@@ -49,7 +49,7 @@ def split_dataset_into_test_and_train_sets(all_data_dir, training_data_dir, test
     num_training_files = 0
     num_testing_files = 0
 
-    for subdir, dirs, files in os.walk(all_data_dir):
+    for subdir, _, files in os.walk(all_data_dir):
         category_name = os.path.basename(subdir)
 
         # Don't create a subdirectory for the root directory
