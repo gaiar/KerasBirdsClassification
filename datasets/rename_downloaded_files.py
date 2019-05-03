@@ -3,6 +3,8 @@ import os
 import shutil
 import filetype
 import logging
+import random
+
 
 logging.basicConfig(
     filename='renaming.log',
@@ -11,8 +13,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
-DATA_SOURCE_DIR = "data"
-DATA_DEST_DIR = "data-clean"
+DATA_SOURCE_DIR = "data-clean"
+DATA_DEST_DIR = "data"
 
 
 def delete_file(filename):
@@ -79,10 +81,11 @@ def rename_downloads():
                     n = len(os.listdir(dest_dir))
                     logging.debug("{0} :: {1} of files".format(dest_dir,n))
 
-                    new_name = "{0}_{1}{2}".format(
+                    new_name = "{0}_{3}_{1}{2}".format(
                         os.path.basename(dest_dir).lower().replace(" ", "_"),
                         str(n+1),
-                        ext
+                        ext,
+                        random.randint(1000,9999)
                     )
                     print("[INFO] :: Renaming {0} to {1}".format(
                         filename, new_name))
