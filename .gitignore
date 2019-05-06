@@ -26,3 +26,4 @@ valid/
 google-images-download/
 .DS_Store
 *.h5
+*h5
