@@ -1,0 +1,10 @@
+pillow
+nb_black
+tensorflow
+keras
+comet-ml
+requests
+google_images_download
+matplotlib
+filetype
+numpy
