@@ -10,8 +10,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
-SOURCE_DIR = "data"
-DULICATES_DEST = "dupdup"
+SOURCE_DIR = "/home/gaiar/developer/birds-of-berlin/nn/bird-vs-not-bird/dataset/valid"
+DULICATES_DEST = "/home/gaiar/developer/birds-of-berlin/nn/bird-vs-not-bird/dupdup"
 
 
 def move_file(source_file, dest_file):

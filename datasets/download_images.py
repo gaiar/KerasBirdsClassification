@@ -20,9 +20,10 @@ DOWNLOAD_FOLDER = "data-clean"
 STOP_WORDS = ""
 STOP_WORDS_SHUFFLE = False
 DOWNLOAD_VALIDATION = True
-USE_FINETUNING = True
+USE_FINETUNING = False
 USE_FINETUNING_EXTRA = False
-NUM_IMAGES = 100
+NUM_IMAGES = 1000
+TIMEOUT = 5
 
 
 
@@ -77,8 +78,10 @@ def download_from_google():
     arguments["size"] = ">400*300"
     arguments["color_type"] = "full-color"
     arguments["output_directory"] = DOWNLOAD_FOLDER
-    arguments["chromedriver"] = "/Users/user/Developer/conda-stuff/birds-of-berlin/datasets/chromedriver"
+    arguments["type"] = "photo"
+    arguments["chromedriver"] = "/home/gaiar/developer/birds-of-berlin/datasets/chromedriver"
     #arguments["chromedriver"] = "/home/gaiar/developer/smart-birds-feeder/datasets/chromedriver"
+    arguments["socket_timeout"] = TIMEOUT
 
     # Extra fine-tuning if needed
     if USE_FINETUNING:
@@ -93,11 +96,11 @@ def download_from_google():
         for row in birdreader:
             response = google_images_download.googleimagesdownload()
             if len(row["alt_name"]) > 1:
-                keywords = "{0} OR {1} OR {2} {3}".format(
-                    row["name"], row["alt_name"], row["latin_name"], STOP_WORDS)
+                keywords = "{0} OR {1} OR {2} OR {3} {4}".format(
+                    row["name"], row["alt_name"], row["latin_name"], row["russian_name"], STOP_WORDS)
             else:
-                keywords = "{0} OR {1} {2}".format(
-                    row["name"], row["latin_name"], STOP_WORDS)
+                keywords = "{0} OR {1} OR {2} {3}".format(
+                    row["name"], row["latin_name"], row["russian_name"], STOP_WORDS)
 
             arguments["keywords"] = keywords
             prefix = "{0}{1}".format(

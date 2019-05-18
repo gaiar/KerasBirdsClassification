@@ -606,7 +606,7 @@ pred=cnn.predict_generator(test_generator,verbose=1,steps=306/batch_size)
 
 #Running the above code will give output in probabilities so at first I need to convert them to class number. In my case it was 4 classes, so class numbers were 0,1,2 and 3.
 
-Code written:
+#Code written:
 
 predicted_class_indices=np.argmax(pred,axis=1)
 
