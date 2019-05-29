@@ -25,6 +25,20 @@ logging.basicConfig(
 
 fields = ["name","alt_name","russian_name","wiki_de","latin_name","image_url","inat_id","wiki_en","preferred_name","inat_name"]
 
+def prepare_proxies():
+    prx = []
+    try:
+        with open('proxielist.lst', newline='') as proxies:
+            pl = proxies.read().splitlines()
+            for proxy in pl:
+                prx.append({"http":pl})
+    except Exception as err:
+        logging.error("Problem opening proxies file. {0}".format(err))
+        return None
+    return prx if len(prx)>0 else None
+
+
+
 def get_inat_taxa_id():
     birdsfile = 'berlin-birds-extended.csv'
     tempfile = NamedTemporaryFile(mode='w', delete=False)
@@ -134,7 +148,7 @@ def collect_inat_photos(row):
         logging.info("Writing {0} photos for {1} ".format(len(phs),row["name"]))
         db[row["name"]] = phs
 
-#get_inat_photos()
+
 
 def get_db_birds():
     # d = shelve.open("inat_photos_fixed")
@@ -177,7 +191,7 @@ def create_downloads(bird_name, bird_urls):
 
     for url in bird_urls:
         if i<= 20:
-            dest = os.path.join(bird_name,"{0}_{1}.jpg".format(str(bird_name).lower(),i))
+            dest = os.path.join("data",bird_name,"{0}_{1}.jpg".format(str(bird_name).lower(),i))
             entries.append((dest,url))
             i+=1
         else:
@@ -209,4 +223,6 @@ def download_images():
                     print("We got {0} for {1}".format(len(urls), row["name"]))
                     download_image(urls)
 
-download_images()
+
+get_inat_photos()
+#download_images()
