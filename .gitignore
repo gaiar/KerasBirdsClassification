@@ -27,3 +27,5 @@ google-images-download/
 .DS_Store
 *.h5
 *h5
+inat/inat_photos.db
+inat/inat_photos_fixed.db
