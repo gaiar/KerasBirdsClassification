@@ -170,12 +170,12 @@ def get_db_birds():
 
 #get_db_birds()
 
-def fetch_url(entry):
+def fetch_url(entry,header,proxy):
     path, uri = entry
     print("Download file {0} to {1}".format(uri, path))
     if not os.path.exists(path):
         print("Download file {0} to {1}".format(uri, path))
-        r = requests.get(uri, stream=True)
+        r = requests.get(uri, stream=True,headers=header,proxies=proxy)
         if r.status_code == 200:
             with open(path, 'wb') as f:
                 for chunk in r:
@@ -199,11 +199,19 @@ def create_downloads(bird_name, bird_urls):
             break
     return entries
 
+from fake_useragent import UserAgent
+import random
 def download_image(entries):
     print("Downloading {0}".format(entries))
     #results = ThreadPool(4).imap_unordered(fetch_url, entries)
+
+    proxies = prepare_proxies()
+    ua = UserAgent()    
+
     for entry in entries:
-        fetch_url(entry)
+        header = {'User-Agent':str(ua.chrome)}
+        proxy = random.choice(proxies)     
+        fetch_url(entry, header, proxy)
     #for path in results:
     #    print(path)
 
@@ -226,3 +234,4 @@ def download_images():
 
 get_inat_photos()
 #download_images()
+
