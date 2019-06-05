@@ -31,7 +31,7 @@ def prepare_proxies():
         with open('proxielist.lst', newline='') as proxies:
             pl = proxies.read().splitlines()
             for proxy in pl:
-                prx.append({"http":pl})
+                prx.append({"http":proxy, "https":proxy})
     except Exception as err:
         logging.error("Problem opening proxies file. {0}".format(err))
         return None
@@ -172,30 +172,39 @@ def get_db_birds():
 
 def fetch_url(entry,header,proxy):
     path, uri = entry
-    print("Download file {0} to {1}".format(uri, path))
+    #print("Download file {0} to {1}".format(uri, path))
     if not os.path.exists(path):
-        print("Download file {0} to {1}".format(uri, path))
-        r = requests.get(uri, stream=True,headers=header,proxies=proxy)
+        print("[INFO] :: Download file {0} to {1}".format(uri, path))
+        logging.info("Download file {0} to {1}".format(uri, path))
+        try:
+            r = requests.get(uri, stream=True,headers=header,proxies=proxy)
+        except Exception as e:
+            logging.error("[ERROR] :: Problem with download {0}. Exception {1}".format(uri, e.message))
+            r = requests.get(uri, stream=True,headers=header)
         if r.status_code == 200:
             with open(path, 'wb') as f:
                 for chunk in r:
                     f.write(chunk)
+        else:
+            logging.error("Problem with download {0}. Status {1}".format(uri, r.status_code))
+            print("[ERROR] :: Problem downloading {0}. Status {1}".format(uri,r.status_code))
     return path
 
 
 def create_downloads(bird_name, bird_urls):
     i = 0
     entries = []
-    if not os.path.exists(bird_name):
-        os.mkdir(bird_name)
+    bird_path = os.path.join("data",bird_name)
+    if not os.path.exists(bird_path):
+        os.mkdir(bird_path)
 
     for url in bird_urls:
         if i<= 20:
-            dest = os.path.join("data",bird_name,"{0}_{1}.jpg".format(str(bird_name).lower(),i))
+            dest = os.path.join(bird_path,"{0}_{1}.jpg".format(str(bird_name).lower(),i))
             entries.append((dest,url))
             i+=1
         else:
-            print("Got {0} entries. Exiting".format(len(entries)))
+            print("[INFO] :: Got {0} entries. Exiting".format(len(entries)))
             break
     return entries
 
@@ -203,8 +212,12 @@ from fake_useragent import UserAgent
 import random
 def download_image(entries):
     print("Downloading {0}".format(entries))
+    
+    #TODO :: Fix multithread download
     #results = ThreadPool(4).imap_unordered(fetch_url, entries)
-
+    #for path in results:
+    #    print(path)
+    
     proxies = prepare_proxies()
     ua = UserAgent()    
 
@@ -212,8 +225,7 @@ def download_image(entries):
         header = {'User-Agent':str(ua.chrome)}
         proxy = random.choice(proxies)     
         fetch_url(entry, header, proxy)
-    #for path in results:
-    #    print(path)
+ 
 
 def download_images():
     with shelve.open('inat_photos') as db:
@@ -224,11 +236,14 @@ def download_images():
                 try:
                     images = db[row["name"]]
                 except Exception as e:
-                    print("No images available")
-                print("We have {0} URLs for {1}".format(len(images), row["name"]))
+                    print("[ERROR] :: No images available for {0}".format(row["name"]))
+                
+                print("[INFO] :: We have {0} URLs for {1}".format(len(images), row["name"]))
+                logging.info("We have {0} URLs for {1}".format(len(images), row["name"]))
+
                 if len(images) > 0:
                     urls = create_downloads(row["name"],images)
-                    print("We got {0} for {1}".format(len(urls), row["name"]))
+                    print("[INFO] :: After process we got {0} URLs for {1}".format(len(urls), row["name"]))
                     download_image(urls)
 
 
