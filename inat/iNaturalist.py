@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-
 from pyinaturalist.node_api import get_all_observations, get_observations, make_inaturalist_api_get_call
 import csv
 from pprint import pprint
@@ -12,6 +11,8 @@ import logging
 import os
 import requests
 from multiprocessing.pool import ThreadPool
+from fake_useragent import UserAgent
+import random
 
 THROTTLING_DELAY = 0.55
 
@@ -28,10 +29,11 @@ fields = ["name","alt_name","russian_name","wiki_de","latin_name","image_url","i
 def prepare_proxies():
     prx = []
     try:
-        with open('proxielist.lst', newline='') as proxies:
+        with open('proxylist.lst') as proxies:
             pl = proxies.read().splitlines()
+            #print(pl)
             for proxy in pl:
-                prx.append({"http":pl})
+                prx.append({"http":str(proxy), "https":str(proxy)})
     except Exception as err:
         logging.error("Problem opening proxies file. {0}".format(err))
         return None
@@ -172,25 +174,33 @@ def get_db_birds():
 
 def fetch_url(entry,header,proxy):
     path, uri = entry
-    print("Download file {0} to {1}".format(uri, path))
+    #print("Download file {0} to {1}".format(uri, path))
     if not os.path.exists(path):
         print("Download file {0} to {1}".format(uri, path))
-        r = requests.get(uri, stream=True,headers=header,proxies=proxy)
+        try:
+            r = requests.get(uri, stream=True,headers=header,proxies=proxy,timeout=5)
+        except Exception as e:
+            r = requests.get(uri, stream=True,headers=header)
+        finally:
+            return None
         if r.status_code == 200:
             with open(path, 'wb') as f:
                 for chunk in r:
                     f.write(chunk)
+        else:
+            print("Problem with download {0}".format(r.status_code))
     return path
 
 
 def create_downloads(bird_name, bird_urls):
     i = 0
     entries = []
-    if not os.path.exists(bird_name):
-        os.mkdir(bird_name)
+    bird_path = os.path.join("data",bird_name)
+    if not os.path.exists(bird_path):
+        os.mkdir(bird_path)
 
     for url in bird_urls:
-        if i<= 20:
+        if i<= 300:
             dest = os.path.join("data",bird_name,"{0}_{1}.jpg".format(str(bird_name).lower(),i))
             entries.append((dest,url))
             i+=1
@@ -199,10 +209,9 @@ def create_downloads(bird_name, bird_urls):
             break
     return entries
 
-from fake_useragent import UserAgent
-import random
+
 def download_image(entries):
-    print("Downloading {0}".format(entries))
+    #print("Downloading {0}".format(entries))
     #results = ThreadPool(4).imap_unordered(fetch_url, entries)
 
     proxies = prepare_proxies()
@@ -210,7 +219,8 @@ def download_image(entries):
 
     for entry in entries:
         header = {'User-Agent':str(ua.chrome)}
-        proxy = random.choice(proxies)     
+        proxy = random.choice(proxies)
+        print("Using proxy: {0}".format(proxy))  
         fetch_url(entry, header, proxy)
     #for path in results:
     #    print(path)
@@ -232,6 +242,6 @@ def download_images():
                     download_image(urls)
 
 
-get_inat_photos()
-#download_images()
+#get_inat_photos()
+download_images()
 
