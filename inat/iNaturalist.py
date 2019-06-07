@@ -178,11 +178,10 @@ def fetch_url(entry,header,proxy):
     if not os.path.exists(path):
         print("Download file {0} to {1}".format(uri, path))
         try:
-            r = requests.get(uri, stream=True,headers=header,proxies=proxy,timeout=5)
+            r = requests.get(uri, stream=True,headers=header,proxies=proxy,timeout=3)
         except Exception as e:
+            print("Problems connecting with proxy {0}".format(proxy))
             r = requests.get(uri, stream=True,headers=header)
-        finally:
-            return None
         if r.status_code == 200:
             with open(path, 'wb') as f:
                 for chunk in r:
