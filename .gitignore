@@ -24,7 +24,7 @@ data-all/
 duplicates-all/
 valid/
 .DS_Store
-nn/bird-vs-not-bird/models/*
+nn/bird-vs-not-bird/models/*.*
 datasets/create_thumbnails.py
 inat/inat_photos.db
 inat/inat_photos_fixed.db
